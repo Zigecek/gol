@@ -1,11 +1,14 @@
 package xyz.kozohorsky.gol;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector3;
+
 import java.awt.*;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
-import static xyz.kozohorsky.gol.Gol.UNITS_PER_SIDE;
+import static xyz.kozohorsky.gol.Gol.cellSize;
 
 public class Game {
   private static Game instance;
@@ -18,7 +21,6 @@ public class Game {
   public static Game get() {
     if (instance == null) {
       instance = new Game();
-      instance.fillRandom();
     }
     return instance;
   }
@@ -74,30 +76,20 @@ public class Game {
           // avoid the cell itself
           continue;
         }
-        int neighbourX = x + i;
-        int neighbourY = y + j;
-        if (neighbourX >= 0 && neighbourX < UNITS_PER_SIDE && neighbourY >= 0 && neighbourY < UNITS_PER_SIDE) {
-          // if the neighbour is within the bounds of the grid, call the method
-          // TODO: make the grid infinite
-          method.accept(neighbourX, neighbourY);
-        }
+        method.accept(x + i, y + j);
       }
     }
   }
 
-  public void fillRandom() {
+  public void fillRandom(Vector3 from, Vector3 to) {
     aliveCells.clear();
-    for (int x = 0; x < UNITS_PER_SIDE; x++) {
-      for (int y = 0; y < UNITS_PER_SIDE; y++) {
-        if (Math.random() > 0.5) {
+    for (int x = (int) from.x; x < (int) to.x; x++) {
+      for (int y = (int) from.y; y < (int) to.y; y++) {
+        if (Math.random() > 0.90) {
           aliveCells.add(new Point(x, y));
         }
       }
     }
-  }
-
-  public boolean isGenerationAlive() {
-    return !aliveCells.isEmpty();
   }
 
   public void toggleCell(int x, int y) {
@@ -115,24 +107,7 @@ public class Game {
     aliveCells.add(new Point(x, y));
   }
 
-  public void setCellDead(int x, int y, boolean killNeighbours) {
+  public void setCellDead(int x, int y) {
     aliveCells.remove(new Point(x, y));
-    if (killNeighbours) {
-      forEachNeighbour(x, y, (neighbourX, neighbourY) -> {
-        aliveCells.remove(new Point(neighbourX, neighbourY));
-      });
-    }
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    for (int y = 0; y < UNITS_PER_SIDE; y++) {
-      for (int x = 0; x < UNITS_PER_SIDE; x++) {
-        sb.append(aliveCells.contains(new Point(x, y)) ? "O" : "X");
-      }
-      sb.append("\n");
-    }
-    return sb.toString();
   }
 }
