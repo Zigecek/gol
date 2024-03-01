@@ -11,12 +11,14 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.ScreenUtils;
+
+import java.awt.*;
 
 public class Gol extends ApplicationAdapter {
   public static final long SLEEP_TIME = 500;
-  public static final int UNIT_SIZE = 20;
   public static final int UNITS_PER_SIDE = 200;
-  public static final int WIDTH = UNIT_SIZE * UNITS_PER_SIDE;
+  public static final int WIDTH = UNITS_PER_SIDE;
   public static final int HEIGHT = WIDTH;
   private SpriteBatch batch;
   private OrthographicCamera camera;
@@ -62,6 +64,8 @@ public class Gol extends ApplicationAdapter {
 
   @Override
   public void render() {
+    ScreenUtils.clear(Color.BLACK, true);
+
     if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
       Game.get().isInEditMode = !Game.get().isInEditMode;
     }
@@ -71,14 +75,19 @@ public class Gol extends ApplicationAdapter {
         Game.get().fillRandom();
       }
       if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
-        Game.get().reset();
+        Game.get().aliveCells.clear();
+        System.out.println("Should be cleared");
       }
-      if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+      if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) || Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
         Vector3 clickCoordinates = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(clickCoordinates);
-        int x = (int) (clickCoordinates.x / UNIT_SIZE);
-        int y = (int) (clickCoordinates.y / UNIT_SIZE);
-        Game.get().toggleUnit(x, y);
+        int x = (int) (clickCoordinates.x);
+        int y = (int) (clickCoordinates.y);
+        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+          Game.get().setCellAlive(x, y);
+        } else {
+          Game.get().setCellDead(x, y, true);
+        }
       }
     }
     Color colorAlive;
@@ -88,12 +97,15 @@ public class Gol extends ApplicationAdapter {
       colorAlive = Color.WHITE;
     }
 
+    // Rendering of the game cells
     shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-    for (int y = 0; y < UNITS_PER_SIDE; y++) {
-      for (int x = 0; x < UNITS_PER_SIDE; x++) {
-        shapeRenderer.setColor(Game.get().isAlive(x, y) ? colorAlive : Color.BLACK);
-        shapeRenderer.rect(x * UNIT_SIZE, y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-      }
+    for (Point cell : Game.get().aliveCells) {
+      shapeRenderer.setColor(colorAlive);
+      shapeRenderer.rect(
+        cell.x,
+        cell.y,
+        1,
+        1);
     }
     shapeRenderer.end();
 
