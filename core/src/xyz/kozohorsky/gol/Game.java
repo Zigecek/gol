@@ -4,13 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
 
 import java.awt.*;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
-import static xyz.kozohorsky.gol.Gol.cellSize;
-
 public class Game {
+  private static final boolean PARALLEL = false;
   private static Game instance;
   public HashSet<Point> aliveCells = new HashSet<Point>();
   public boolean isInEditMode = true;
@@ -27,8 +28,23 @@ public class Game {
 
   public void nextGeneration() {
     if (isInEditMode) return;
+
+    System.out.println("Computing next generation of " + aliveCells.size() + " cells");
+
+    Instant start = Instant.now();
+    if (PARALLEL) {
+      nextGenerationParallel();
+    } else {
+      nextGenerationSerial();
+    }
+    Instant ends = Instant.now();
+    Duration duration = Duration.between(start, ends);
+    printHumanDuration(duration);
+  }
+
+  private void nextGenerationSerial() {
     HashSet<Point> newAliveCells = new HashSet<>();
-    HashSet<Point> checkedCells = new HashSet<>();
+    HashSet<Point> checkedNeighbours = new HashSet<>();
     for (Point cell : aliveCells) {
       int aliveNeighbours = countAliveNeighbours(cell.x, cell.y);
       if (aliveNeighbours < 2) {
@@ -45,17 +61,19 @@ public class Game {
       // 4. REPRODUCTION
       forEachNeighbour(cell.x, cell.y, (neighbourX, neighbourY) -> {
         Point neighbour = new Point(neighbourX, neighbourY);
-        if (checkedCells.contains(neighbour)) {
+        if (checkedNeighbours.contains(neighbour) || aliveCells.contains(neighbour)) {
           return;
         }
         if (countAliveNeighbours(neighbourX, neighbourY) == 3) {
           newAliveCells.add(neighbour);
         }
-        checkedCells.add(neighbour);
+        checkedNeighbours.add(neighbour);
       });
     }
     aliveCells = newAliveCells;
   }
+
+  private void nextGenerationParallel() {}
 
   private int countAliveNeighbours(int x, int y) {
     AtomicInteger count = new AtomicInteger(); // IDK what is this, IDE suggested it
@@ -90,6 +108,7 @@ public class Game {
         }
       }
     }
+    System.out.println("Filled with " + aliveCells.size() + " cells");
   }
 
   public void toggleCell(int x, int y) {
@@ -109,5 +128,16 @@ public class Game {
 
   public void setCellDead(int x, int y) {
     aliveCells.remove(new Point(x, y));
+  }
+
+  public void printHumanDuration(Duration duration) {
+    String formattedElapsedTime = String.format("%02d days %02d h %02d min %02d s %d ms %d ns",
+      duration.toDaysPart(),
+      duration.toHoursPart(),
+      duration.toMinutesPart(),
+      duration.toSecondsPart(),
+      duration.toMillisPart(),
+      duration.toNanosPart() % 1000000L);
+    System.out.println("Computing took: " + formattedElapsedTime);
   }
 }

@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.*;
 //import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 //import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -22,7 +21,7 @@ public class Gol extends ApplicationAdapter {
   private OrthographicCamera camera;
   private ShapeRenderer shapeRenderer;
   private ScrollProcessor scrollProcessor;
-  public float cameraZoom = 1.0f;
+  public float cameraZoom = 10.0f;
 
   private final Thread loopThread = new Thread(() -> {
     while (true) {
@@ -62,15 +61,19 @@ public class Gol extends ApplicationAdapter {
   public void render() {
     ScreenUtils.clear(Color.BLACK, true);
 
-    // Camera zoom
-    cameraZoom = Math.max(cameraZoom + scrollProcessor.scrollAmount * cameraZoom * 0.1f, 0.1f);
-    scrollProcessor.scrollAmount = 0;
-    camera.viewportWidth = (int) (Gdx.graphics.getWidth() * cameraZoom);
-    camera.viewportHeight = (int) (Gdx.graphics.getHeight() * cameraZoom);
+    // to update the camera
     camera.update();
     shapeRenderer.setProjectionMatrix(camera.combined);
 
-    keyActions();
+    // Camera zoom
+    cameraZoom = Math.max(cameraZoom + scrollProcessor.scrollAmount * cameraZoom * 0.1f, 0.1f);
+    camera.viewportWidth = (int) (Gdx.graphics.getWidth() * cameraZoom);
+    camera.viewportHeight = (int) (Gdx.graphics.getHeight() * cameraZoom);
+
+
+    scrollProcessor.scrollAmount = 0;
+
+    inputActions();
 
     // Rendering of the game cells
     if (Game.get().isInEditMode) {
@@ -89,7 +92,7 @@ public class Gol extends ApplicationAdapter {
     shapeRenderer.end();
   }
 
-  private void keyActions() {
+  private void inputActions() {
     if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
       Game.get().isInEditMode = !Game.get().isInEditMode;
     }
@@ -97,10 +100,13 @@ public class Gol extends ApplicationAdapter {
     // dragging camera
     if (Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) {
       if (Gdx.input.isTouched()) {
-        camera.translate(-Gdx.input.getDeltaX()*cameraZoom, Gdx.input.getDeltaY()*cameraZoom);
-        camera.update();
-        shapeRenderer.setProjectionMatrix(camera.combined);
+        camera.translate(-Gdx.input.getDeltaX() * cameraZoom, Gdx.input.getDeltaY() * cameraZoom);
       }
+    }
+
+    // next generation manually
+    if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
+      Game.get().nextGeneration();
     }
 
     // edit mode actions
@@ -137,7 +143,6 @@ public class Gol extends ApplicationAdapter {
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
           // LEFT CLICK - set cell alive
           Game.get().setCellAlive(x, y);
-          System.out.println("coords: " + x + " " + y);
         } else {
           // RIGHT CLICK - set cell dead
           Game.get().setCellDead(x, y);
@@ -146,14 +151,6 @@ public class Gol extends ApplicationAdapter {
     }
   }
 
-/*
-  @Override
-  public void resize(int width, int height) {
-    camera.setToOrtho(false, width, height);
-    camera.update();
-    shapeRenderer.setProjectionMatrix(camera.combined);
-  }
-*/
   @Override
   public void dispose() {
     batch.dispose();

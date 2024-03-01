@@ -11,7 +11,7 @@ public class DesktopLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS((int) (1/SLEEP_TIME*2));
 		config.setTitle("Game Of Life");
-		config.setWindowedMode(1200, 400);
+		config.setWindowedMode(1000, 1000);
 		new Lwjgl3Application(new Gol(), config);
 	}
 }
