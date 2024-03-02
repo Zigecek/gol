@@ -1,6 +1,5 @@
 package xyz.kozohorsky.gol;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
 
 import java.awt.*;
@@ -10,25 +9,14 @@ import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
-public class Game {
+public class GameLogic {
   private static final boolean PARALLEL = false;
-  private static Game instance;
+  public long delay = 500;
   public HashSet<Point> aliveCells = new HashSet<Point>();
   public boolean isInEditMode = true;
-
-  private Game() {
-  }
-
-  public static Game get() {
-    if (instance == null) {
-      instance = new Game();
-    }
-    return instance;
-  }
+  private long lastGenerationTime = 0;
 
   public void nextGeneration() {
-    if (isInEditMode) return;
-
     System.out.println("Computing next generation of " + aliveCells.size() + " cells");
 
     Instant start = Instant.now();
@@ -38,8 +26,13 @@ public class Game {
       nextGenerationSerial();
     }
     Instant ends = Instant.now();
+    lastGenerationTime = System.nanoTime();
     Duration duration = Duration.between(start, ends);
     printHumanDuration(duration);
+  }
+
+  public long getLastGenerationTime() {
+    return lastGenerationTime;
   }
 
   private void nextGenerationSerial() {
