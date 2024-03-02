@@ -1,4 +1,4 @@
-package xyz.kozohorsky.gol;
+package xyz.kozohorsky.gol.stages;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -6,30 +6,34 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.*;
+import xyz.kozohorsky.gol.utils.GameLogic;
 
 import java.awt.*;
 
-public class GameStage extends GolStage {
+public class GameStage extends LayoutStage {
   public final static int WORLD_WIDTH = 100; // doesn't matter
   public final static int WORLD_HEIGHT = 100; // doesn't matter
   public final static int CELL_SIZE = 1;
   private final GameLogic gameLogic;
   private final ShapeRenderer shapeRenderer;
 
-  public GameStage() {
+  public GameStage(int scaling) {
     super(
       new ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT,
         new OrthographicCamera(WORLD_WIDTH, WORLD_HEIGHT)
-      )
+      ),
+      scaling
     );
-    getCamera().position.set(getCamera().viewportWidth / 2, getCamera().viewportHeight / 2, 0);
 
     shapeRenderer = new ShapeRenderer();
     shapeRenderer.setColor(Color.WHITE);
 
     gameLogic = new GameLogic();
+  }
+
+  public GameStage() {
+    this(-1);
   }
 
   @Override
@@ -90,10 +94,7 @@ public class GameStage extends GolStage {
       if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
         // calculate x, y of the cells in camera's viewport (bottom left and top right corners) take into account the zoom and the camera position
 
-        gameLogic.fillRandom(
-          getViewport().unproject(new Vector3(0, getViewport().getScreenHeight() + getViewport().getScreenY(), 0)),
-          getViewport().unproject(new Vector3(getViewport().getScreenWidth() + getViewport().getScreenX(), 0, 0))
-        );
+        fillRandom();
       }
       // C - clear
       if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
@@ -103,6 +104,7 @@ public class GameStage extends GolStage {
 
       // mouse click actions
       if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) || Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+        if (!isInsideViewport(Gdx.input.getX(), Gdx.input.getY())) return;
 
         Vector3 clickCoordinates = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
         getViewport().unproject(clickCoordinates);
@@ -121,6 +123,17 @@ public class GameStage extends GolStage {
     }
   }
 
+  private void fillRandom() {
+    if (gameLogic == null) return;
+
+    System.out.println("Viewport size " + getViewport().getScreenWidth() + "x" + getViewport().getScreenHeight());
+
+    gameLogic.fillRandom(
+      getViewport().unproject(getScreenBottomLeft()),
+      getViewport().unproject(getScreenTopRight())
+    );
+  }
+
   @Override
   public boolean scrolled(float amountX, float amountY) {
     getCamera().zoom = Math.max(getCamera().zoom * (1 + amountY * 0.1f), 0.1f);
@@ -128,8 +141,9 @@ public class GameStage extends GolStage {
   }
 
   @Override
-  public void setViewportToScreen() {
-    getViewport().setScreenBounds(0, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
+  public void initLayout() {
+    //getCamera().position.set(getCamera().viewportWidth / 2, getCamera().viewportHeight / 2, 0);
+    fillRandom();
   }
 
   @Override

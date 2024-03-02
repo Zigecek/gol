@@ -1,22 +1,25 @@
-package xyz.kozohorsky.gol;
+package xyz.kozohorsky.gol.stages;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
-public class ConfigurationStage extends GolStage {
+public class ConfigurationStage extends LayoutStage {
   public final static int WORLD_WIDTH = 100; // doesn't matter
   public final static int WORLD_HEIGHT = 100; // doesn't matter
-  //private final OrthographicCamera cam;
 
-  public ConfigurationStage() {
+  public ConfigurationStage(int scaling) {
     super(
       new ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT,
         new OrthographicCamera(WORLD_WIDTH, WORLD_HEIGHT)
-      )
+      ),
+      scaling
     );
-    getCamera().position.set(getCamera().viewportWidth / 2, getCamera().viewportHeight / 2, 0);
+  }
+
+  public ConfigurationStage() {
+    this(-1);
   }
 
   @Override
@@ -30,12 +33,12 @@ public class ConfigurationStage extends GolStage {
   }
 
   @Override
-  public void setViewportToScreen() {
-    getViewport().setScreenBounds(0, 0, Gdx.graphics.getWidth() /*/ 2*/, Gdx.graphics.getHeight());
+  public void dispose() {
+    super.dispose();
   }
 
   @Override
-  public void dispose() {
-    super.dispose();
+  public void initLayout() {
+    getCamera().position.set(getCamera().viewportWidth / 2, getCamera().viewportHeight / 2, 0);
   }
 }

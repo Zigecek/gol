@@ -1,4 +1,4 @@
-package xyz.kozohorsky.gol;
+package xyz.kozohorsky.gol.utils;
 
 import com.badlogic.gdx.math.Vector3;
 
