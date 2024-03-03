@@ -2,13 +2,16 @@ package xyz.kozohorsky.gol.stages;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import xyz.kozohorsky.gol.layout.Layoutable;
 
 import java.lang.reflect.Field;
 
-public abstract class LayoutStage extends GolStage implements Layoutable {
-  private int scaling;
+public abstract class LayoutStage extends Stage implements Layoutable {
+  private final int scaling;
 
   static LayoutStage activeStage;
 
@@ -23,6 +26,11 @@ public abstract class LayoutStage extends GolStage implements Layoutable {
   }
 
   public abstract void initLayout();
+
+  @Override
+  public OrthographicCamera getCamera() {
+    return (OrthographicCamera) super.getCamera();
+  }
 
   @Override
   public void act() {
@@ -43,6 +51,21 @@ public abstract class LayoutStage extends GolStage implements Layoutable {
       }
     }
     return false;
+  }
+
+  @Override
+  public void set(int x, int y, int width, int height) {
+    getViewport().setWorldSize(width, height);
+    getViewport().setScreenBounds(x, y, width, height);
+    getViewport().apply();
+  }
+
+  public Vector3 getScreenBottomLeft() {
+    return new Vector3(getViewport().getScreenX(), Gdx.graphics.getHeight() - getViewport().getScreenY(), 0);
+  }
+
+  public Vector3 getScreenTopRight() {
+    return new Vector3(getViewport().getScreenX() + getViewport().getScreenWidth(), Gdx.graphics.getHeight() - (getViewport().getScreenY() + getViewport().getScreenHeight()), 0);
   }
 
   @Override

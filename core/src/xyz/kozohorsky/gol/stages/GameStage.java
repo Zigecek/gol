@@ -10,8 +10,10 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import xyz.kozohorsky.gol.utils.GameLogic;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public class GameStage extends LayoutStage {
+  public static ArrayList<GameStage> instances = new ArrayList<>();
   private final GameLogic gameLogic;
   private final ShapeRenderer shapeRenderer;
 
@@ -22,12 +24,13 @@ public class GameStage extends LayoutStage {
       ),
       scaling
     );
+    instances.add(this);
 
     shapeRenderer = new ShapeRenderer();
     shapeRenderer.setColor(Color.WHITE);
 
     gameLogic = new GameLogic();
-    getCamera().zoom = 0.08f;
+    getCamera().zoom = 1f;
   }
 
   public GameStage() {
@@ -43,7 +46,7 @@ public class GameStage extends LayoutStage {
     mouseActions();
 
     // Next generation computation
-    if (System.nanoTime() - gameLogic.getLastGenerationTime() >= gameLogic.delay * 1000000 &&
+    if (System.nanoTime() - gameLogic.getLastGenerationTime() >= gameLogic.delay * 1000000L &&
       !gameLogic.isInEditMode) {
       gameLogic.nextGeneration();
     }
@@ -74,7 +77,6 @@ public class GameStage extends LayoutStage {
     }
     // next generation manually
     if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
-      System.out.println("Force next generation");
       gameLogic.nextGeneration();
     }
 
@@ -87,7 +89,6 @@ public class GameStage extends LayoutStage {
       // C - clear
       if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
         gameLogic.aliveCells.clear();
-        System.out.println("Cleared.");
       }
     }
   }
@@ -128,10 +129,8 @@ public class GameStage extends LayoutStage {
     }
   }
 
-  private void fillRandom() {
+  public void fillRandom() {
     if (gameLogic == null) return;
-
-    System.out.println("Viewport size " + getViewport().getScreenWidth() + "x" + getViewport().getScreenHeight());
 
     gameLogic.fillRandom(
       getViewport().unproject(getScreenBottomLeft()),
@@ -143,7 +142,6 @@ public class GameStage extends LayoutStage {
   public boolean scrolled(float amountX, float amountY) {
     if (!isInsideViewport(Gdx.input.getX(), Gdx.input.getY())) return super.scrolled(amountX, amountY);
     getCamera().zoom = Math.max(getCamera().zoom * (1 + amountY * 0.1f), 0.01f);
-    System.out.println("Zoomed to " + getCamera().zoom);
     return super.scrolled(amountX, amountY);
   }
 

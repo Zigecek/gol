@@ -28,7 +28,7 @@ public class Row extends LayoutElement implements Layoutable {
     }
     int currentX = x;
     for (Layoutable element : elements) {
-      int elementWidth = width / totalScaling * (element.getScaling() > 0 ? element.getScaling() : 1);
+      int elementWidth = Math.round((float) width / totalScaling * (element.getScaling() > 0f ? element.getScaling() : 1f));
       element.set(
         currentX,
         y,

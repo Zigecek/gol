@@ -30,7 +30,7 @@ public class Main extends ApplicationAdapter {
     stageManager = new StageManager(
       new Row(
         new GameStage(5),
-        new ConfigurationStage(2)
+        new ConfigurationStage(3)
       )
     );
     Gdx.input.setInputProcessor(stageManager.getInputProcessor());
@@ -50,9 +50,9 @@ public class Main extends ApplicationAdapter {
 
   @Override
   public void resize(int width, int height) {
-    if ((float) width /height != 7f/5f) {
-      Gdx.graphics.setWindowedMode(width, width / 7 * 5);
-      stageManager.updateViewport(width, width / 7 * 5);
+    if (width < 725 || height < 450) {
+      Gdx.graphics.setWindowedMode(725, 450);
+      stageManager.updateViewport(725, 450);
       return;
     }
     stageManager.updateViewport(width, height);

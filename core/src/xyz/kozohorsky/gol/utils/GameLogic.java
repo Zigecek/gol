@@ -5,16 +5,22 @@ import com.badlogic.gdx.math.Vector3;
 import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
 public class GameLogic {
+  public static ArrayList<GameLogic> instances = new ArrayList<>();
+  public int delay = 500;
   private static final boolean PARALLEL = false;
-  public long delay = 500;
   public HashSet<Point> aliveCells = new HashSet<Point>();
   public boolean isInEditMode = true;
   private long lastGenerationTime = 0;
+
+  public GameLogic() {
+    instances.add(this);
+  }
 
   public void nextGeneration() {
     System.out.println("Computing next generation of " + aliveCells.size() + " cells");

@@ -32,10 +32,7 @@ public class StageManager extends Stage {
     }
   }
 
-  public void render() {/*
-    for (LayoutStage stage : stages) {
-      new Thread(stage).start();
-    }*/
+  public void render() {
     stages.parallelStream().forEach(LayoutStage::act);
 
     for (LayoutStage stage : stages) {

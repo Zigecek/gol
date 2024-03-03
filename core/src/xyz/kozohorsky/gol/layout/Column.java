@@ -28,7 +28,7 @@ public class Column extends LayoutElement implements Layoutable {
     }
     int currentY = y;
     for (Layoutable element : elements) {
-      int elementHeight = height / totalScaling * (element.getScaling() > 0 ? element.getScaling() : 1);
+      int elementHeight = Math.round((float) height / totalScaling * (element.getScaling() > 0 ? element.getScaling() : 1));
       element.set(
         x,
         currentY,
