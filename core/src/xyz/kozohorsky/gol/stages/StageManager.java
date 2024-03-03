@@ -1,18 +1,14 @@
 package xyz.kozohorsky.gol.stages;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import xyz.kozohorsky.gol.Main;
 import xyz.kozohorsky.gol.layout.LayoutElement;
 import xyz.kozohorsky.gol.layout.Layoutable;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-public class StageManager extends GolStage {
+public class StageManager extends Stage {
   ArrayList<LayoutStage> stages = new ArrayList<>();
   ArrayList<Layoutable> layoutElements = new ArrayList<>();
 

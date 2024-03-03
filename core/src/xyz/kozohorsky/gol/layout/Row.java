@@ -1,7 +1,5 @@
 package xyz.kozohorsky.gol.layout;
 
-import xyz.kozohorsky.gol.stages.LayoutStage;
-
 public class Row extends LayoutElement implements Layoutable {
 
   public Row(int scaling, Layoutable... elements) {
@@ -16,7 +14,6 @@ public class Row extends LayoutElement implements Layoutable {
 
   @Override
   public void set(int x, int y, int width, int height) {
-    super.set(x, y, width, height);
     int totalScaling = 0;
     for (Layoutable element : elements) {
       if (element.getScaling() <= 0) {
@@ -29,7 +26,6 @@ public class Row extends LayoutElement implements Layoutable {
     if (totalScaling < 2) {
       totalScaling = elements.length;
     }
-    System.out.println("Placing " + elements.length + " elements in a ROW");
     int currentX = x;
     for (Layoutable element : elements) {
       int elementWidth = width / totalScaling * (element.getScaling() > 0 ? element.getScaling() : 1);

@@ -14,7 +14,6 @@ public class Column extends LayoutElement implements Layoutable {
 
   @Override
   public void set(int x, int y, int width, int height) {
-    super.set(x, y, width, height);
     int totalScaling = 0;
     for (Layoutable element : elements) {
       if (element.getScaling() <= 0) {
@@ -27,7 +26,6 @@ public class Column extends LayoutElement implements Layoutable {
     if (totalScaling < 2) {
       totalScaling = elements.length;
     }
-    System.out.println("Placing " + elements.length + " elements in a COLUMN");
     int currentY = y;
     for (Layoutable element : elements) {
       int elementHeight = height / totalScaling * (element.getScaling() > 0 ? element.getScaling() : 1);

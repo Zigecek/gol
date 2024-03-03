@@ -2,7 +2,6 @@ package xyz.kozohorsky.gol.stages;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import xyz.kozohorsky.gol.layout.Layoutable;
 
@@ -26,17 +25,11 @@ public abstract class LayoutStage extends GolStage implements Layoutable {
   public abstract void initLayout();
 
   @Override
-  public void set(int x, int y, int width, int height) {
-    System.out.println("Setting layout stage to " + width + "x" + height);
-    super.set(x, y, width, height);
-  }
-
-  @Override
   public void act() {
     if (anyMouseButtonJustPressed() && isInsideViewport(Gdx.input.getX(), Gdx.input.getY())) {
       activeStage = this;
     }
-    super.act();
+    super.act(Gdx.graphics.getDeltaTime());
   }
 
   private boolean anyMouseButtonJustPressed() {

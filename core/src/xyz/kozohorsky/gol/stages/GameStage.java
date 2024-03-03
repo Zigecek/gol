@@ -6,8 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.*;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import xyz.kozohorsky.gol.utils.GameLogic;
 
 import java.awt.*;
@@ -18,7 +17,7 @@ public class GameStage extends LayoutStage {
 
   public GameStage(int scaling) {
     super(
-      new ExtendViewport(50,0,
+      new ScreenViewport(//50,0,
         new OrthographicCamera()
       ),
       scaling
@@ -28,6 +27,7 @@ public class GameStage extends LayoutStage {
     shapeRenderer.setColor(Color.WHITE);
 
     gameLogic = new GameLogic();
+    getCamera().zoom = 0.08f;
   }
 
   public GameStage() {
@@ -87,7 +87,7 @@ public class GameStage extends LayoutStage {
       // C - clear
       if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
         gameLogic.aliveCells.clear();
-        System.out.println("Should be cleared");
+        System.out.println("Cleared.");
       }
     }
   }
@@ -142,7 +142,7 @@ public class GameStage extends LayoutStage {
   @Override
   public boolean scrolled(float amountX, float amountY) {
     if (!isInsideViewport(Gdx.input.getX(), Gdx.input.getY())) return super.scrolled(amountX, amountY);
-    getCamera().zoom = Math.max(getCamera().zoom * (1 + amountY * 0.1f), 0.1f);
+    getCamera().zoom = Math.max(getCamera().zoom * (1 + amountY * 0.1f), 0.01f);
     System.out.println("Zoomed to " + getCamera().zoom);
     return super.scrolled(amountX, amountY);
   }

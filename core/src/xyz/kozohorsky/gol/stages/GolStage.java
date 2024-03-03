@@ -4,14 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public abstract class GolStage extends Stage {
-
-  public GolStage() {
-    super();
-  }
 
   public GolStage(Viewport viewport) {
     super(viewport);
@@ -23,8 +18,9 @@ public abstract class GolStage extends Stage {
   }
 
   public void set(int x, int y, int width, int height) {
-    getViewport().update(width, height);
+    getViewport().setWorldSize(width, height);
     getViewport().setScreenBounds(x, y, width, height);
+    getViewport().apply();
   }
 
   public Vector3 getScreenBottomLeft() {

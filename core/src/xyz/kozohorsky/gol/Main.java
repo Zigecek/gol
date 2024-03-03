@@ -4,9 +4,11 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
-import xyz.kozohorsky.gol.layout.Column;
 import xyz.kozohorsky.gol.layout.Row;
-import xyz.kozohorsky.gol.stages.*;
+import xyz.kozohorsky.gol.stages.ConfigurationStage;
+import xyz.kozohorsky.gol.stages.GameStage;
+import xyz.kozohorsky.gol.stages.LayoutStage;
+import xyz.kozohorsky.gol.stages.StageManager;
 
 public class Main extends ApplicationAdapter {
   private Main() {
@@ -27,14 +29,8 @@ public class Main extends ApplicationAdapter {
   public void create() {
     stageManager = new StageManager(
       new Row(
-        new Column(
-          new GameStage(),
-          new GameStage()
-        ),
-        new Column(
-          new GameStage(),
-          new GameStage()
-        )
+        new GameStage(5),
+        new ConfigurationStage(2)
       )
     );
     Gdx.input.setInputProcessor(stageManager.getInputProcessor());
@@ -54,8 +50,11 @@ public class Main extends ApplicationAdapter {
 
   @Override
   public void resize(int width, int height) {
-    System.out.println("Resized to " + width + "x" + height);
-
+    if ((float) width /height != 7f/5f) {
+      Gdx.graphics.setWindowedMode(width, width / 7 * 5);
+      stageManager.updateViewport(width, width / 7 * 5);
+      return;
+    }
     stageManager.updateViewport(width, height);
   }
 
