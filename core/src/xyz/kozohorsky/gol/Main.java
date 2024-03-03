@@ -2,9 +2,7 @@ package xyz.kozohorsky.gol;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import xyz.kozohorsky.gol.layout.Column;
 import xyz.kozohorsky.gol.layout.Row;

@@ -28,8 +28,8 @@ public class ConfigurationStage extends LayoutStage {
   }
 
   @Override
-  public void act(float delta) {
-    super.act(delta);
+  public void act() {
+    super.act();
   }
 
   @Override

@@ -6,22 +6,20 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.*;
 import xyz.kozohorsky.gol.utils.GameLogic;
 
 import java.awt.*;
 
 public class GameStage extends LayoutStage {
-  public final static int WORLD_WIDTH = 100; // doesn't matter
-  public final static int WORLD_HEIGHT = 100; // doesn't matter
-  public final static int CELL_SIZE = 1;
   private final GameLogic gameLogic;
   private final ShapeRenderer shapeRenderer;
 
   public GameStage(int scaling) {
     super(
-      new ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT,
-        new OrthographicCamera(WORLD_WIDTH, WORLD_HEIGHT)
+      new ExtendViewport(50,0,
+        new OrthographicCamera()
       ),
       scaling
     );
@@ -37,11 +35,12 @@ public class GameStage extends LayoutStage {
   }
 
   @Override
-  public void act(float delta) {
-    getViewport().apply();
+  public void act() {
+    super.act();
     shapeRenderer.setProjectionMatrix(getCamera().combined);
 
-    inputActions();
+    keyActions();
+    mouseActions();
 
     // Next generation computation
     if (System.nanoTime() - gameLogic.getLastGenerationTime() >= gameLogic.delay * 1000000 &&
@@ -52,6 +51,7 @@ public class GameStage extends LayoutStage {
 
   @Override
   public void draw() {
+    super.draw();
     if (gameLogic.isInEditMode) {
       shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
     } else {
@@ -62,26 +62,16 @@ public class GameStage extends LayoutStage {
       shapeRenderer.rect(
         cell.x,
         cell.y,
-        CELL_SIZE,
-        CELL_SIZE);
+        1,
+        1);
     }
     shapeRenderer.end();
   }
 
-  private void inputActions() {
+  private void keyActions() {
     if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
       gameLogic.isInEditMode = !gameLogic.isInEditMode;
     }
-
-    // dragging camera
-    if (Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) {
-      if (Gdx.input.isTouched()) {
-        getCamera().translate(
-          -Gdx.input.getDeltaX() * 0.25f * getCamera().zoom,
-          Gdx.input.getDeltaY() * 0.25f * getCamera().zoom);
-      }
-    }
-
     // next generation manually
     if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
       System.out.println("Force next generation");
@@ -92,8 +82,6 @@ public class GameStage extends LayoutStage {
     if (gameLogic.isInEditMode) {
       // R - fill random
       if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-        // calculate x, y of the cells in camera's viewport (bottom left and top right corners) take into account the zoom and the camera position
-
         fillRandom();
       }
       // C - clear
@@ -101,16 +89,33 @@ public class GameStage extends LayoutStage {
         gameLogic.aliveCells.clear();
         System.out.println("Should be cleared");
       }
+    }
+  }
 
-      // mouse click actions
+  private void mouseActions() {
+    float factor = getCamera().zoom * 0.4f;
+    // dragging camera
+    if (Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) {
+      // check if the first touch is inside the viewport
+      if (activeStage != this) return;
+
+      if (Gdx.input.isTouched()) {
+        getCamera().translate(
+          -Gdx.input.getDeltaX() * factor,
+          Gdx.input.getDeltaY() * factor
+        );
+      }
+    }
+
+    if (gameLogic.isInEditMode) {
       if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) || Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-        if (!isInsideViewport(Gdx.input.getX(), Gdx.input.getY())) return;
+        if (activeStage != this) return;
 
         Vector3 clickCoordinates = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
         getViewport().unproject(clickCoordinates);
 
-        int x = (int) Math.floor(clickCoordinates.x / CELL_SIZE);
-        int y = (int) Math.floor(clickCoordinates.y / CELL_SIZE);
+        int x = (int) Math.floor(clickCoordinates.x);
+        int y = (int) Math.floor(clickCoordinates.y);
 
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
           // LEFT CLICK - set cell alive
@@ -136,7 +141,9 @@ public class GameStage extends LayoutStage {
 
   @Override
   public boolean scrolled(float amountX, float amountY) {
+    if (!isInsideViewport(Gdx.input.getX(), Gdx.input.getY())) return super.scrolled(amountX, amountY);
     getCamera().zoom = Math.max(getCamera().zoom * (1 + amountY * 0.1f), 0.1f);
+    System.out.println("Zoomed to " + getCamera().zoom);
     return super.scrolled(amountX, amountY);
   }
 

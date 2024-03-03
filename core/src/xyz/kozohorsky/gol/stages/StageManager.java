@@ -36,9 +36,13 @@ public class StageManager extends GolStage {
     }
   }
 
-  public void render() {
+  public void render() {/*
     for (LayoutStage stage : stages) {
-      stage.act();
+      new Thread(stage).start();
+    }*/
+    stages.parallelStream().forEach(LayoutStage::act);
+
+    for (LayoutStage stage : stages) {
       stage.draw();
     }
   }

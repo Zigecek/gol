@@ -26,17 +26,7 @@ public abstract class GolStage extends Stage {
     getViewport().update(width, height);
     getViewport().setScreenBounds(x, y, width, height);
   }
-/*
-  public Vector3 getScreenBottomLeft() {
-    System.out.println("Screen bottom left: " + getViewport().getScreenX() + "x" + getViewport().getScreenY());
-    return new Vector3(getViewport().getScreenX(), getViewport().getScreenY(), 0);
-  }
 
-  public Vector3 getScreenTopRight() {
-    System.out.println("Screen top right: " + (getViewport().getScreenX() + getViewport().getScreenWidth()) + "x" + getViewport().getScreenY());
-    return new Vector3(getViewport().getScreenX() + getViewport().getScreenWidth(), getViewport().getScreenY() + getViewport().getScreenHeight(), 0);
-  }
-*/
   public Vector3 getScreenBottomLeft() {
     return new Vector3(getViewport().getScreenX(), Gdx.graphics.getHeight() - getViewport().getScreenY(), 0);
   }
