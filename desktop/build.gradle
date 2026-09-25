@@ -1,9 +1,12 @@
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
-sourceSets.main.resources.srcDirs = ["../assets"]
+sourceSets.main.resources.srcDirs = [ rootProject.file("assets") ]
 
 project.ext.mainClassName = "xyz.kozohorsky.gol.DesktopLauncher"
-project.ext.assetsDir = new File("../assets")
+// Resolve against the project root so the working directory is <repo>/assets
+// regardless of where Gradle is invoked from (a raw new File("../assets")
+// resolves against the Gradle daemon's CWD, which breaks the run task).
+project.ext.assetsDir = rootProject.file("assets")
 
 import org.gradle.internal.os.OperatingSystem
 

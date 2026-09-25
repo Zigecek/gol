@@ -1,0 +1,2 @@
+# This folder is the libGDX working directory / assets root for the desktop run task.
+# Keep it in version control (even while empty) so `gradlew desktop:run` works right after cloning.
